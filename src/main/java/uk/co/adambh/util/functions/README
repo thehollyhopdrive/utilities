@@ -1,0 +1,36 @@
+This package provides utilities for making the new function classes in Java 8 a 
+little more useful.
+
+Specifically, the MethodReferences class currently contains a set of utility 
+methods for allowing the use of lambdas and method references that throw checked 
+exceptions in situations where only runtime exceptions are permitted.
+
+Code examples:
+
+    import static uk.co.adambh.util.functions.MethodReferences.*;
+
+    private static final class _FakeFunction {
+        public static String intToString(Integer theValue) 
+                throws Exception {
+            return theValue.toString();
+        }
+    }
+    
+    private static final class _FakeConsumer {
+        public static void consume(String theValue) 
+                throws Exception {
+            System.out.println(theValue);
+        }
+    }
+
+    public static void examples() {
+        Stream.of(1, 2, 3, 4)
+              .map(unchecked(_FakeFunction::intToString))
+              .forEach(unchecked(_FakeConsumer::consume, 
+                                 IllegalStateException::new));
+        
+        Stream.of("java.lang.Object", "java.lang.String")
+              .map(unchecked((String theValue) -> Class.forName(theValue),
+                      IllegalArgumentException::new));
+    }
+ 
